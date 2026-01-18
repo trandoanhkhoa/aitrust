@@ -122,9 +122,8 @@ export default function Instruction() {
         <div className="space-y-6">
           {/* Video hướng dẫn */}
           <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200">
-            <video className="w-full" controls onEnded={() => setXemXong(true)}>
-              {typeoftest === 0 ? <source src={aipro} /> : <source src={aideveloping} />}
-              {/* <source src={aideveloping} /> */}
+            <video key={typeoftest} className="w-full" controls onEnded={() => setXemXong(true)}>
+              <source src={typeoftest === 0 ? aipro : aideveloping} />
               Trình duyệt của bạn không hỗ trợ video.
             </video>
           </div>
