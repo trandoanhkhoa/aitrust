@@ -88,66 +88,82 @@ export default function ChatboxMobileUI() {
   );
 
   const handleSend = async () => {
+    const text = queryRef.current?.trim();
+    if (!text) return;
+
+    setMessages((prev) => [...prev, { role: 'user', text }]);
+    setOpenChat(true);
+    setLoading(true);
+
+    // Clear input (safe)
+    if (textareaRef.current) {
+      textareaRef.current.value = '';
+      textareaRef.current.style.height = '36px';
+    }
+    queryRef.current = '';
+
+    /* ===== SAFE LOCAL STORAGE ===== */
+    let token = null;
+    let itemQuestions = [];
+    let IDquestioncurrent = null;
+
     try {
-      const text = queryRef.current?.trim();
-      if (!text) return;
+      token = JSON.parse(localStorage.getItem('token') || 'null');
+      itemQuestions = JSON.parse(localStorage.getItem('Itemquestion') || '[]');
+      IDquestioncurrent = Number(localStorage.getItem('questionIDcurrent'));
+    } catch (e) {
+      console.warn('LocalStorage error', e);
+    }
 
-      setMessages((prev) => [...prev, { role: 'user', text }]);
-      setOpenChat(true);
-      setLoading(true);
+    const IDuser = token?.[0]?.userID;
+    const currentQuestion = itemQuestions.find((q) => q.idquestion === IDquestioncurrent);
+    const questionTrytimes = currentQuestion?.trytimes ?? 0;
 
-      // clear input (SAFE)
-      if (textareaRef.current) {
-        textareaRef.current.value = '';
-        textareaRef.current.style.height = '36px';
-      }
-      queryRef.current = '';
+    const userMsg = {
+      role: 'user',
+      text,
+      iduser: IDuser,
+      idquestioncurrent: IDquestioncurrent,
+      questiontrytimes: questionTrytimes,
+      isaskingaboutanswer: false,
+    };
 
-      /* ===== SAFE localStorage ===== */
-      let token = null;
-      let itemQuestions = [];
-      let IDquestioncurrent = null;
+    /* ===== API 1: CHECK ASKING ===== */
+    let isAsking = false;
+    try {
+      isAsking = await GroqApi.Isaskingaboutanswerasync({ text });
+    } catch (e) {
+      console.error('Isasking API failed', e);
+    }
 
-      try {
-        token = JSON.parse(localStorage.getItem('token') || 'null');
-        itemQuestions = JSON.parse(localStorage.getItem('Itemquestion') || '[]');
-        IDquestioncurrent = Number(localStorage.getItem('questionIDcurrent'));
-      } catch (e) {
-        console.warn('localStorage parse error', e);
-      }
+    /* ===== UPDATE TRY TIMES ===== */
+    if (isAsking && currentQuestion) {
+      const updated = itemQuestions.map((q) =>
+        q.idquestion === IDquestioncurrent ? { ...q, trytimes: q.trytimes + 1 } : q,
+      );
+      localStorage.setItem('Itemquestion', JSON.stringify(updated));
+    }
 
-      const IDuser = token?.[0]?.userID;
-      const currentQuestion = itemQuestions.find((q) => q.idquestion === IDquestioncurrent);
-      const questionTrytimes = currentQuestion?.trytimes ?? 0;
-
-      const userMsg = {
-        role: 'user',
-        text,
-        iduser: IDuser,
-        idquestioncurrent: IDquestioncurrent,
-        questiontrytimes: questionTrytimes,
-        isaskingaboutanswer: false,
-      };
-
-      /* ===== CALL API ===== */
-      const isAsking = await GroqApi.Isaskingaboutanswerasync({ text });
-
-      if (isAsking && currentQuestion) {
-        const updated = itemQuestions.map((q) =>
-          q.idquestion === IDquestioncurrent ? { ...q, trytimes: q.trytimes + 1 } : q,
-        );
-        localStorage.setItem('Itemquestion', JSON.stringify(updated));
-      }
-
+    /* ===== API 2: GET RESPONSE ===== */
+    try {
       const res = await GroqApi.getResponse({
         ...userMsg,
         isaskingaboutanswer: isAsking,
       });
 
-      const response = res?.choices?.[0]?.message?.content || '⚠️ Không có phản hồi';
-      setMessages((prev) => [...prev, { role: 'ai', text: response }]);
-    } catch (err) {
-      console.error('Chat error:', err);
+      const response =
+        res &&
+        res.choices &&
+        res.choices[0] &&
+        res.choices[0].message &&
+        res.choices[0].message.content;
+
+      setMessages((prev) => [
+        ...prev,
+        { role: 'ai', text: response || '⚠️ Không có phản hồi từ AI.' },
+      ]);
+    } catch (e) {
+      console.error('AI response failed', e);
       setMessages((prev) => [...prev, { role: 'ai', text: '❌ Có lỗi xảy ra, vui lòng thử lại.' }]);
     } finally {
       setLoading(false);
