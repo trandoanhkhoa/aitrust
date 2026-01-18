@@ -18,9 +18,11 @@ export default function ChatboxMobileUI() {
             setOpenChat(true);
 
             // đợi Bottom Sheet animate xong rồi focus textarea
-            setTimeout(() => {
-              textareaRef.current?.focus();
-            }, 300);
+            requestAnimationFrame(() => {
+              setTimeout(() => {
+                textareaRef.current?.focus();
+              }, 350);
+            });
           }}
           title="Xem lại đoạn chat trước"
           className="
@@ -86,73 +88,72 @@ export default function ChatboxMobileUI() {
   );
 
   const handleSend = async () => {
-    const text = queryRef.current?.trim();
-    if (!queryRef.current?.trim()) return;
-
-    setMessages((prev) => [...prev, { role: 'user', text }]);
-
-    setOpenChat(true);
-    setLoading(true);
-
-    // clear input
-    queryRef.current = '';
-    textareaRef.current.value = '';
-    textareaRef.current.style.height = '36px';
-
-    /* ========================
-    2. Chuẩn bị dữ liệu
-    ========================= */
-    const token = JSON.parse(localStorage.getItem('token'));
-    const itemQuestions = JSON.parse(localStorage.getItem('Itemquestion')) || [];
-    const IDuser = token?.[0]?.userID;
-    const IDquestioncurrent = Number(localStorage.getItem('questionIDcurrent'));
-    const currentQuestion = itemQuestions.find((q) => q.idquestion === IDquestioncurrent);
-    const questionTrytimes = currentQuestion?.trytimes ?? 0;
-
-    /* ========================
-   3. Push user message ngay
-  ========================= */
-    const userMsg = {
-      role: 'user',
-      text,
-      iduser: IDuser,
-      idquestioncurrent: IDquestioncurrent,
-      questiontrytimes: questionTrytimes,
-      isaskingaboutanswer: false,
-    };
-
     try {
-      /* ========================
-     4. CHECK asking TRƯỚC
-      ========================= */
+      const text = queryRef.current?.trim();
+      if (!text) return;
+
+      setMessages((prev) => [...prev, { role: 'user', text }]);
+      setOpenChat(true);
+      setLoading(true);
+
+      // clear input (SAFE)
+      if (textareaRef.current) {
+        textareaRef.current.value = '';
+        textareaRef.current.style.height = '36px';
+      }
+      queryRef.current = '';
+
+      /* ===== SAFE localStorage ===== */
+      let token = null;
+      let itemQuestions = [];
+      let IDquestioncurrent = null;
+
+      try {
+        token = JSON.parse(localStorage.getItem('token') || 'null');
+        itemQuestions = JSON.parse(localStorage.getItem('Itemquestion') || '[]');
+        IDquestioncurrent = Number(localStorage.getItem('questionIDcurrent'));
+      } catch (e) {
+        console.warn('localStorage parse error', e);
+      }
+
+      const IDuser = token?.[0]?.userID;
+      const currentQuestion = itemQuestions.find((q) => q.idquestion === IDquestioncurrent);
+      const questionTrytimes = currentQuestion?.trytimes ?? 0;
+
+      const userMsg = {
+        role: 'user',
+        text,
+        iduser: IDuser,
+        idquestioncurrent: IDquestioncurrent,
+        questiontrytimes: questionTrytimes,
+        isaskingaboutanswer: false,
+      };
+
+      /* ===== CALL API ===== */
       const isAsking = await GroqApi.Isaskingaboutanswerasync({ text });
 
-      /* ========================
-     5. Update trytimes nếu cần
-      ========================= */
-      if (isAsking) {
+      if (isAsking && currentQuestion) {
         const updated = itemQuestions.map((q) =>
           q.idquestion === IDquestioncurrent ? { ...q, trytimes: q.trytimes + 1 } : q,
         );
-
         localStorage.setItem('Itemquestion', JSON.stringify(updated));
       }
-      /* ========================
-        6. Gọi AI SAU CÙNG
-      ========================= */
+
       const res = await GroqApi.getResponse({
         ...userMsg,
         isaskingaboutanswer: isAsking,
       });
 
-      const response = res.choices[0].message.content;
+      const response = res?.choices?.[0]?.message?.content || '⚠️ Không có phản hồi';
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
-    } catch (error) {
+    } catch (err) {
+      console.error('Chat error:', err);
       setMessages((prev) => [...prev, { role: 'ai', text: '❌ Có lỗi xảy ra, vui lòng thử lại.' }]);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <>
       {/* ================= MAIN LAYOUT ================= */}
