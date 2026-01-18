@@ -202,7 +202,7 @@ export default function ChatboxMobileUI() {
             <textarea
               ref={textareaRef}
               rows={1}
-              placeholder="Tương tác với AI tại đây..."
+              placeholder="Thoải mái hỏi AI..."
               className="
         flex-1
         bg-transparent

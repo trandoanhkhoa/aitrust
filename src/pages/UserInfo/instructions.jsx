@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-
+import aideveloping from '../../assets/video/aideveloping.mov';
+import aipro from '../../assets/video/AIpro.mov';
 export default function Instruction() {
   const [xemXong, setXemXong] = useState(false);
   const [typeoftest, settypeoftest] = useState(0);
@@ -122,16 +123,34 @@ export default function Instruction() {
           {/* Video hướng dẫn */}
           <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200">
             <video className="w-full" controls onEnded={() => setXemXong(true)}>
-              <source src="https://youtu.be/Ee-VKCy83QA" type="video/mp4" />
+              {typeoftest === 0 ? <source src={aipro} /> : <source src={aideveloping} />}
+              {/* <source src={aideveloping} /> */}
               Trình duyệt của bạn không hỗ trợ video.
             </video>
           </div>
 
           {/* Thông báo */}
           {!xemXong && (
-            <p className="text-sm text-slate-500 text-center">
-              👉 Vui lòng xem hết video để tiếp tục làm bài
-            </p>
+            <div
+              className="
+  mt-4
+  flex
+  items-center
+  gap-2
+  rounded-lg
+  border
+  border-blue-200
+  bg-blue-50
+  px-4
+  py-3
+  text-sm
+  sm:text-base
+  text-blue-700
+  font-medium
+"
+            >
+              👉 <span>Vui lòng xem hết video để tiếp tục làm bài</span>
+            </div>
           )}
         </div>
         {/* <div
@@ -165,18 +184,32 @@ export default function Instruction() {
         <button
           disabled={!xemXong}
           onClick={nextPage}
-          className="
-      flex items-center gap-2
-      px-6 py-3
-      rounded-xl
-      bg-gradient-to-r from-emerald-500 to-cyan-500
-      text-white font-medium
-      shadow-lg
-      hover:from-emerald-600 hover:to-cyan-600
-      hover:shadow-xl
-      transition-all duration-300
-      active:scale-95
-    "
+          className={`
+    flex items-center gap-2
+    px-6 py-3
+    rounded-xl
+    text-white font-medium
+    shadow-lg
+    transition-all duration-300
+
+    ${
+      xemXong
+        ? `
+          bg-gradient-to-r from-emerald-500 to-cyan-500
+          hover:from-emerald-600 hover:to-cyan-600
+          hover:shadow-xl
+          active:scale-95
+          cursor-pointer
+        `
+        : `
+          bg-gray-300
+          text-gray-500
+          shadow-none
+          cursor-not-allowed
+          opacity-60
+        `
+    }
+  `}
         >
           📋 Bắt đầu làm bài
           <span className="text-lg">→</span>

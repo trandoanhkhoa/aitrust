@@ -142,7 +142,7 @@ export default function QuizSlide() {
             py-3
           "
           >
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               {answers.map((ans, idx) => (
                 <label
                   key={idx}
