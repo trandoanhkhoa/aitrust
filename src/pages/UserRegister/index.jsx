@@ -10,7 +10,7 @@ export default function UserRegisterInfo() {
     gender: '',
     major: '',
     studyYear: 0,
-    gpa: 0,
+    gpa: '',
     yearofbirth: 0,
   });
   const checkMissingFields = (data) => {
@@ -39,7 +39,9 @@ export default function UserRegisterInfo() {
 
       // ❗ DÙNG BIẾN LOCAL
       if (missing.length > 0) {
+        console.log('Missing fields:', form);
         setMissingFields(missing);
+
         alert('Có thông tin gì đó không hợp lệ!🥲');
         return;
       }
@@ -123,35 +125,47 @@ export default function UserRegisterInfo() {
             ]}
           />
           <Input
-            type="text" // 👈 đổi sang text để kiểm soát tốt hơn
+            type="text"
             name="gpa"
             inputMode="decimal"
             label="GPA (4.0)"
+            value={form.gpa}
             onChange={(e) => {
               let value = e.target.value;
 
-              // 1️⃣ Chuẩn hóa dấu phẩy thành dấu chấm
+              // Chuẩn hóa dấu phẩy
               value = value.replace(',', '.');
 
-              // 2️⃣ Cho phép rỗng
+              // Cho phép rỗng
               if (value === '') {
                 handleChange({
-                  ...e,
-                  target: { ...e.target, value },
+                  target: {
+                    name: 'gpa',
+                    value: '',
+                  },
                 });
                 return;
               }
 
-              // 3️⃣ Chỉ cho phép số + 1 dấu chấm
+              // Cho phép số + 1 dấu .
               if (!/^\d*\.?\d*$/.test(value)) return;
 
-              const num = Number(value);
-
-              // 4️⃣ Validate GPA
-              if (!isNaN(num) && num >= 0 && num <= 4) {
+              // 👉 LUÔN set state
+              handleChange({
+                target: {
+                  name: 'gpa',
+                  value,
+                },
+              });
+            }}
+            onBlur={() => {
+              const num = Number(form.gpa);
+              if (form.gpa !== '' && (isNaN(num) || num < 0 || num > 4)) {
                 handleChange({
-                  ...e,
-                  target: { ...e.target, value },
+                  target: {
+                    name: 'gpa',
+                    value: '',
+                  },
                 });
               }
             }}
