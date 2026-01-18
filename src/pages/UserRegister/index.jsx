@@ -129,6 +129,7 @@ export default function UserRegisterInfo() {
             max={4}
             step={0.01}
             inputMode="decimal"
+            label="GPA (4.0)"
             onChange={(e) => {
               const value = e.target.value;
 
