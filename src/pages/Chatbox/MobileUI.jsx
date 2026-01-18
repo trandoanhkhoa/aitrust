@@ -9,6 +9,81 @@ export default function ChatboxMobileUI() {
   const [messages, setMessages] = useState([]); // store chat history
   const [openChat, setOpenChat] = useState(false);
   const [loading, setLoading] = useState(false);
+  const ChatInput = () => (
+    <div className="border-t bg-white px-3 py-2">
+      <div className="flex items-end gap-2 bg-gray-200 rounded-xl px-2 py-2">
+        {/* ===== History / Open Chat Button ===== */}
+        <button
+          onClick={() => {
+            setOpenChat(true);
+
+            // đợi Bottom Sheet animate xong rồi focus textarea
+            setTimeout(() => {
+              textareaRef.current?.focus();
+            }, 300);
+          }}
+          title="Xem lại đoạn chat trước"
+          className="
+          flex items-center justify-center
+          w-9 h-9 rounded-lg
+          bg-white text-slate-700 shadow-sm
+          hover:bg-gray-100
+          active:scale-95 transition
+        "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 8v4l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </button>
+
+        {/* ===== Textarea ===== */}
+        <textarea
+          ref={textareaRef}
+          rows={1}
+          placeholder="Thoải mái hỏi AI..."
+          className="
+          flex-1 bg-transparent resize-none outline-none
+          max-h-[120px] text-sm leading-5 py-2
+        "
+          onInput={(e) => {
+            queryRef.current = e.target.value;
+            e.target.style.height = 'auto';
+            e.target.style.height = `${e.target.scrollHeight}px`;
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+        />
+
+        {/* ===== Send Button ===== */}
+        <button
+          onClick={handleSend}
+          className="
+          bg-blue-600 text-white
+          w-9 h-9 rounded-lg
+          flex items-center justify-center
+          active:scale-95 transition
+        "
+        >
+          ➤
+        </button>
+      </div>
+    </div>
+  );
 
   const handleSend = async () => {
     const text = queryRef.current?.trim();
@@ -131,6 +206,7 @@ export default function ChatboxMobileUI() {
                     </div>
                   )}
                 </div>
+                <ChatInput />
               </div>
             </div>
           )}
@@ -147,109 +223,7 @@ export default function ChatboxMobileUI() {
         </div>
 
         {/* ================= INPUT AREA ================= */}
-        <div className="sticky bottom-0 px-3 py-2 border-t bg-white">
-          <div
-            className="
-      flex
-      items-center
-      gap-2
-
-      bg-gray-200
-      rounded-xl
-      px-2
-      py-2
-    "
-          >
-            {/* ===== Storage / History Button ===== */}
-            <button
-              onClick={() => setOpenChat(true)}
-              title="Xem lại đoạn chat trước"
-              className="
-        flex
-        items-center
-        justify-center
-
-        w-9
-        h-9
-        rounded-lg
-
-        bg-white
-        text-slate-700
-
-        shadow-sm
-        hover:bg-gray-100
-        active:scale-95
-        transition
-      "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 8v4l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </button>
-
-            {/* ===== Textarea ===== */}
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              placeholder="Thoải mái hỏi AI..."
-              className="
-        flex-1
-        bg-transparent
-        resize-none
-        outline-none
-
-        max-h-[120px]
-        text-sm
-        leading-5
-        py-2
-      "
-              onInput={(e) => {
-                queryRef.current = e.target.value;
-                e.target.style.height = 'auto';
-                e.target.style.height = `${e.target.scrollHeight}px`;
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-            />
-
-            {/* ===== Send Button ===== */}
-            <button
-              onClick={handleSend}
-              className="
-        bg-blue-600
-        text-white
-
-        w-9
-        h-9
-        rounded-lg
-
-        flex
-        items-center
-        justify-center
-
-        active:scale-95
-        transition
-      "
-            >
-              ➤
-            </button>
-          </div>
-        </div>
+        <ChatInput />
       </div>
     </>
   );
