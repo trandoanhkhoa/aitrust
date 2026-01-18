@@ -72,10 +72,10 @@ export default function SurveyPage() {
       score: traLoi[q.id] ?? 5, // nếu chưa chọn → 5
     }));
 
-    const checkOK = SurveyApi.submitsurvey(payload);
+    const checkOK = await SurveyApi.submitsurvey(payload);
     if (!checkOK) console.log('Lỗi chưa được gửi');
     // //chuyển hướng sang trang kết thúc
-    window.location.href = '/finishedsurvey';
+    else window.location.href = '/finishedsurvey';
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-emerald-50 p-6 flex justify-center">
