@@ -155,63 +155,11 @@ export default function ChatboxMobileUI() {
   };
   return (
     <>
-      <div className=" bg-gray-50 flex flex-col justify-end">
-        {/* ================= CHAT AREA ================= */}
-        <div
-          id="chatArea"
-          className="
-          flex-1 overflow-y-auto
-          px-3 py-4
-          sm:px-6
-          max-w-3xl w-full mx-auto
-        "
-        >
-          {openChat && (
-            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-center items-end">
-              {/* Bottom Sheet */}
-              <div className="bg-white w-full max-h-[85dvh] rounded-t-2xl flex flex-col animate-slideUp">
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b">
-                  <span className="text-sm font-medium text-gray-700">Chat Response</span>
-                  <button onClick={() => setOpenChat(false)} className="text-gray-500 text-xl">
-                    ✕
-                  </button>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-                  {messages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={`
-                  max-w-[90%] px-4 py-3 rounded-2xl text-sm
-                  ${
-                    msg.role === 'user'
-                      ? 'ml-auto bg-blue-600 text-white'
-                      : 'mr-auto bg-gray-100 text-gray-800'
-                  }
-                `}
-                    >
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
-                    </div>
-                  ))}
-
-                  {loading && (
-                    <div className="mr-auto bg-gray-200 text-gray-600 px-4 py-3 rounded-2xl shadow-sm">
-                      <div className="flex gap-2">
-                        <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></span>
-                        <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-200"></span>
-                        <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-400"></span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <ChatInput />
-              </div>
-            </div>
-          )}
-
-          {loading && (
+      {/* ================= MAIN LAYOUT ================= */}
+      <div className="bg-gray-50 flex flex-col">
+        {/* Chat area */}
+        <div id="chatArea" className=" px-3 py-4 sm:px-6 max-w-3xl w-full mx-auto">
+          {loading && !openChat && (
             <div className="mr-auto bg-gray-200 text-gray-600 px-4 py-3 rounded-2xl shadow-sm">
               <div className="flex gap-2">
                 <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></span>
@@ -222,9 +170,68 @@ export default function ChatboxMobileUI() {
           )}
         </div>
 
-        {/* ================= INPUT AREA ================= */}
+        {/* Input cố định */}
         <ChatInput />
       </div>
+
+      {/* ================= BOTTOM SHEET ================= */}
+      {openChat && (
+        <div className="fixed inset-0 z-[999] bg-black/50 flex items-end">
+          {/* Bottom Sheet – KHÔNG DÙNG vh */}
+          <div
+            className="
+            bg-white w-full
+            rounded-t-2xl
+            flex flex-col
+            animate-slideUp
+          "
+            style={{
+              height: 'calc(100% - 80px)', // 👈 CHÌA KHÓA
+              paddingBottom: 'env(safe-area-inset-bottom)',
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
+              <span className="text-sm font-medium text-gray-700">Chat Response</span>
+              <button onClick={() => setOpenChat(false)} className="text-gray-500 text-xl">
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`
+                  max-w-[90%] px-4 py-3 rounded-2xl text-sm
+                  ${
+                    msg.role === 'user'
+                      ? 'ml-auto bg-blue-600 text-white'
+                      : 'mr-auto bg-gray-100 text-gray-800'
+                  }
+                `}
+                >
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                </div>
+              ))}
+
+              {loading && (
+                <div className="mr-auto bg-gray-200 text-gray-600 px-4 py-3 rounded-2xl shadow-sm">
+                  <div className="flex gap-2">
+                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></span>
+                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-200"></span>
+                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-400"></span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <ChatInput />
+          </div>
+        </div>
+      )}
     </>
   );
 }
