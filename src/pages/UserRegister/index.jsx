@@ -40,7 +40,7 @@ export default function UserRegisterInfo() {
       // ❗ DÙNG BIẾN LOCAL
       if (missing.length > 0) {
         setMissingFields(missing);
-        alert('Vui lòng nhập đầy đủ thông tin!🥲');
+        alert('Có thông tin gì đó không hợp lệ!🥲');
         return;
       }
 
