@@ -123,16 +123,39 @@ export default function UserRegisterInfo() {
             ]}
           />
           <Input
-            label="GPA Tích lũy (Trên thang 4.0)"
-            name="gpa"
             type="number"
-            value={form.gpa}
-            onChange={handleChange}
+            name="gpa"
             min={0}
             max={4}
             step={0.01}
+            inputMode="decimal"
+            onChange={(e) => {
+              const value = e.target.value;
+
+              if (value === '') {
+                handleChange(e);
+                return;
+              }
+
+              const num = Number(value);
+              if (!isNaN(num) && num >= 0 && num <= 4) {
+                handleChange(e);
+              }
+            }}
           />
-          <Input label="Năm sinh" type="number" name="yearofbirth" onChange={handleChange} />
+          <Input
+            label="Năm sinh"
+            name="yearofbirth"
+            type="text"
+            inputMode="numeric"
+            pattern="\d*"
+            maxLength={4}
+            onChange={(e) => {
+              if (/^\d*$/.test(e.target.value)) {
+                handleChange(e);
+              }
+            }}
+          />
         </div>
 
         {/* Submit */}

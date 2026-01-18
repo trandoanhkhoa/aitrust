@@ -10,7 +10,18 @@ export default function QuizSlide() {
     return saved ? JSON.parse(saved) : [];
   });
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  useEffect(() => {
+    const startTime = () => {
+      const now = new Date();
 
+      // Cộng thêm 7 tiếng cho giờ Việt Nam
+      const vnTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+
+      localStorage.setItem('currentTime', vnTime.toISOString());
+    };
+
+    startTime();
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
