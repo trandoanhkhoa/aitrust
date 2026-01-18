@@ -123,27 +123,40 @@ export default function UserRegisterInfo() {
             ]}
           />
           <Input
-            type="number"
+            type="text" // 👈 đổi sang text để kiểm soát tốt hơn
             name="gpa"
-            min={0}
-            max={4}
-            step={0.01}
             inputMode="decimal"
             label="GPA (4.0)"
             onChange={(e) => {
-              const value = e.target.value;
+              let value = e.target.value;
 
+              // 1️⃣ Chuẩn hóa dấu phẩy thành dấu chấm
+              value = value.replace(',', '.');
+
+              // 2️⃣ Cho phép rỗng
               if (value === '') {
-                handleChange(e);
+                handleChange({
+                  ...e,
+                  target: { ...e.target, value },
+                });
                 return;
               }
 
+              // 3️⃣ Chỉ cho phép số + 1 dấu chấm
+              if (!/^\d*\.?\d*$/.test(value)) return;
+
               const num = Number(value);
+
+              // 4️⃣ Validate GPA
               if (!isNaN(num) && num >= 0 && num <= 4) {
-                handleChange(e);
+                handleChange({
+                  ...e,
+                  target: { ...e.target, value },
+                });
               }
             }}
           />
+
           <Input
             label="Năm sinh"
             name="yearofbirth"
