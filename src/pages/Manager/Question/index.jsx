@@ -74,8 +74,8 @@ export default function QuestionManagement() {
                     />
                   </td>
                   {/* dangerouslySetInnerHTML={{ __html: q.question1 }} */}
-                  <td className="p-3 text-emerald-600">{q.correctAnswer}</td>
-                  <td className="p-3 text-rose-600">{q.hallucinationAnswer}</td>
+                  <td className="p-3 text-emerald-600">{q.correctanswer}</td>
+                  <td className="p-3 text-rose-600">{q.hallucinationanswer}</td>
                   <td className="p-3 text-center font-semibold">{q.timetries}</td>
                   <td className="p-3 text-center space-x-2">
                     <button
