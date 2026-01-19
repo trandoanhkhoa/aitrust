@@ -43,7 +43,9 @@ export default function UserTable({ users = [] }) {
     }
 
     const res = await AnswerUsers.getsurveydetail(userId);
-    setSurveyDetail(res);
+    console.log(res);
+    const sorted = [...res].sort((a, b) => a.surveyid - b.surveyid);
+    setSurveyDetail(sorted);
     setShowDetail(true);
   };
 
