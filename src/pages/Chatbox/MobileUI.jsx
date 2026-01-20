@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import GroqApi from '../../api/GroqApi';
@@ -9,6 +9,50 @@ export default function ChatboxMobileUI() {
   const [messages, setMessages] = useState([]); // store chat history
   const [openChat, setOpenChat] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('chatMessages', []);
+  }, []);
+  function getMessageHistoryByQuestion(idQuestionCurrent) {
+    const raw = localStorage.getItem('chatMessages');
+    if (!raw) return [];
+
+    try {
+      const data = JSON.parse(raw);
+      const found = data.find((item) => item.idCurrentQuestion === idQuestionCurrent);
+      return found ? found.responses : [];
+    } catch {
+      return [];
+    }
+  }
+  function saveAIResponse(idCurrentQuestion, responseAi) {
+    // 1️⃣ Lấy data hiện tại
+    const raw = localStorage.getItem('chatMessages');
+    let data = [];
+
+    try {
+      data = raw ? JSON.parse(raw) : [];
+    } catch {
+      data = [];
+    }
+
+    // 2️⃣ Tìm câu hỏi hiện tại
+    const existing = data.find((item) => item.idCurrentQuestion === idCurrentQuestion);
+
+    if (existing) {
+      // 3️⃣ Nếu đã có → thêm response
+      existing.responses.push(responseAi);
+    } else {
+      // 4️⃣ Nếu chưa có → tạo mới
+      data.push({
+        idCurrentQuestion,
+        responses: [responseAi],
+      });
+    }
+
+    // 5️⃣ Lưu lại
+    localStorage.setItem('chatMessages', JSON.stringify(data));
+  }
   const ChatInput = () => (
     <div className="border-t bg-white px-3 py-2">
       <div className="flex items-end gap-2 bg-gray-200 rounded-xl px-2 py-2">
@@ -126,6 +170,7 @@ export default function ChatboxMobileUI() {
       idquestioncurrent: IDquestioncurrent,
       questiontrytimes: questionTrytimes,
       isaskingaboutanswer: false,
+      messagehistories: getMessageHistoryByQuestion(IDquestioncurrent),
     };
 
     /* ===== API 1: CHECK ASKING ===== */
@@ -162,6 +207,10 @@ export default function ChatboxMobileUI() {
         ...prev,
         { role: 'ai', text: response || '⚠️ Không có phản hồi từ AI.' },
       ]);
+      if (isAsking) {
+        //Lưu IDquestioncurrent và câu trả lời của AI vào localstorage
+        saveAIResponse(IDquestioncurrent, response);
+      }
     } catch (e) {
       console.error('AI response failed', e);
       setMessages((prev) => [...prev, { role: 'ai', text: '❌ Có lỗi xảy ra, vui lòng thử lại.' }]);

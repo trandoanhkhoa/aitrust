@@ -15,10 +15,10 @@ import Question from '../pages/Manager/Question';
 import AddQuestion from '../pages/Manager/Question/addquestion';
 import LayoutAdmin from '../components/DefaultLayoutAdmin/';
 import MaintenancePage from '../pages/MaintenancePage';
-//Can access without login
+
 export const publicRoutes = [
-  { path: '/login', component: MaintenancePage, layout: null },
-  { path: '/userregister', component: MaintenancePage, layout: null },
+  { path: '/login', component: Login, layout: null },
+  { path: '/userregister', component: UserRegister, layout: null },
   { path: '/registersuccess', component: RegisterSuccess, layout: null },
   { path: '/Finishedsurvey', component: Finishedsurvey, layout: null },
   //   { path: '/Dashboard', component: Dashboard },

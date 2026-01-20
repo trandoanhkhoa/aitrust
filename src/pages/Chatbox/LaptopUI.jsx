@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import GroqApi from '../../api/GroqApi';
@@ -8,6 +8,49 @@ export default function ChatboxLaptopUI() {
   const textareaRef = useRef(null);
   const [messages, setMessages] = useState([]); // store chat history
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    localStorage.setItem('chatMessages', []);
+  }, []);
+  function getMessageHistoryByQuestion(idQuestionCurrent) {
+    const raw = localStorage.getItem('chatMessages');
+    if (!raw) return [];
+
+    try {
+      const data = JSON.parse(raw);
+      const found = data.find((item) => item.idCurrentQuestion === idQuestionCurrent);
+      return found ? found.responses : [];
+    } catch {
+      return [];
+    }
+  }
+  function saveAIResponse(idCurrentQuestion, responseAi) {
+    // 1️⃣ Lấy data hiện tại
+    const raw = localStorage.getItem('chatMessages');
+    let data = [];
+
+    try {
+      data = raw ? JSON.parse(raw) : [];
+    } catch {
+      data = [];
+    }
+
+    // 2️⃣ Tìm câu hỏi hiện tại
+    const existing = data.find((item) => item.idCurrentQuestion === idCurrentQuestion);
+
+    if (existing) {
+      // 3️⃣ Nếu đã có → thêm response
+      existing.responses.push(responseAi);
+    } else {
+      // 4️⃣ Nếu chưa có → tạo mới
+      data.push({
+        idCurrentQuestion,
+        responses: [responseAi],
+      });
+    }
+
+    // 5️⃣ Lưu lại
+    localStorage.setItem('chatMessages', JSON.stringify(data));
+  }
   const handleSearch = async () => {
     const text = queryRef.current?.trim();
     if (!text || loading) return;
@@ -43,10 +86,10 @@ export default function ChatboxLaptopUI() {
       idquestioncurrent: IDquestioncurrent,
       questiontrytimes: questionTrytimes,
       isaskingaboutanswer: false,
+      messagehistories: getMessageHistoryByQuestion(IDquestioncurrent),
     };
 
     setMessages((prev) => [...prev, userMsg]);
-
     try {
       /* ========================
      4. CHECK asking TRƯỚC
@@ -75,6 +118,10 @@ export default function ChatboxLaptopUI() {
       const response = res.choices[0].message.content;
 
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
+      if (isAsking) {
+        //Lưu IDquestioncurrent và câu trả lời của AI vào localstorage
+        saveAIResponse(IDquestioncurrent, response);
+      }
     } catch (error) {
       console.error(error);
       setMessages((prev) => [...prev, { role: 'ai', text: '❌ Có lỗi xảy ra, vui lòng thử lại.' }]);

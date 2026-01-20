@@ -27,7 +27,7 @@ function Sidebar() {
       <div
         className={`
           fixed md:static top-0 left-0 h-screen
-          w-64 bg-gradient-to-b from-slate-900 to-slate-800
+          w-56 bg-gradient-to-b from-slate-900 to-slate-800
           text-white flex flex-col p-4 shadow-xl
           transform transition-transform duration-300 z-50
           ${open ? 'translate-x-0' : '-translate-x-full'}

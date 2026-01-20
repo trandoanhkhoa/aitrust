@@ -8,7 +8,6 @@ const axiosClient = axios.create({
     Accept: 'application/json',
   },
 });
-
 //Interceptor before send request to API
 axiosClient.interceptors.request.use(
   (config) => {

@@ -71,7 +71,6 @@ export default function SurveyPage() {
       questionId: q.id,
       score: traLoi[q.id] ?? 5, // nếu chưa chọn → 5
     }));
-
     const checkOK = await SurveyApi.submitsurvey(payload);
     if (!checkOK) console.log('Lỗi chưa được gửi');
     // //chuyển hướng sang trang kết thúc
