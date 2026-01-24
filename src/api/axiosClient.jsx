@@ -8,6 +8,7 @@ const axiosClient = axios.create({
     Accept: 'application/json',
   },
 });
+//https://aitrustapi-production.up.railway.app
 //Interceptor before send request to API
 axiosClient.interceptors.request.use(
   (config) => {

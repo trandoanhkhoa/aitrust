@@ -55,11 +55,14 @@ export default function QuizSlide() {
     startTime();
   }, []);
   const handleAnswerChange = (questionID, selectedValue) => {
-    const updateItems = itemQuestion.map((item) =>
-      item.idquestion == questionID ? { ...item, useranswer: selectedValue } : item,
+    const storedItems = JSON.parse(localStorage.getItem('Itemquestion')) || [];
+
+    const updatedItems = storedItems.map((item) =>
+      item.idquestion === questionID ? { ...item, useranswer: selectedValue } : item,
     );
 
-    localStorage.setItem('Itemquestion', JSON.stringify(updateItems));
+    setItemQuestion(updatedItems);
+    localStorage.setItem('Itemquestion', JSON.stringify(updatedItems));
   };
   const next = () => {
     if (currentIndex < questions.length - 1) {
