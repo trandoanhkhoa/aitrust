@@ -55,13 +55,12 @@ export default function QuizSlide() {
     startTime();
   }, []);
   const handleAnswerChange = (questionID, selectedValue) => {
+    console.log('Selected answer:', selectedValue);
     const storedItems = JSON.parse(localStorage.getItem('Itemquestion')) || [];
 
     const updatedItems = storedItems.map((item) =>
       item.idquestion === questionID ? { ...item, useranswer: selectedValue } : item,
     );
-
-    setItemQuestion(updatedItems);
     localStorage.setItem('Itemquestion', JSON.stringify(updatedItems));
   };
   const next = () => {
