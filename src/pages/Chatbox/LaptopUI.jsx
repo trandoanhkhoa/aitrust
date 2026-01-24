@@ -94,7 +94,7 @@ export default function ChatboxLaptopUI() {
       /* ========================
      4. CHECK asking TRƯỚC
       ========================= */
-      const isAsking = await GroqApi.Isaskingaboutanswerasync({ text });
+      const isAsking = await GroqApi.Isaskingaboutanswerasync(userMsg);
 
       /* ========================
      5. Update trytimes nếu cần
@@ -119,6 +119,7 @@ export default function ChatboxLaptopUI() {
 
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
       if (isAsking) {
+        alert(IDquestioncurrent, response);
         //Lưu IDquestioncurrent và câu trả lời của AI vào localstorage
         saveAIResponse(IDquestioncurrent, response);
       }

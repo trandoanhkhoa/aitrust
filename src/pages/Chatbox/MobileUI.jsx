@@ -176,7 +176,7 @@ export default function ChatboxMobileUI() {
     /* ===== API 1: CHECK ASKING ===== */
     let isAsking = false;
     try {
-      isAsking = await GroqApi.Isaskingaboutanswerasync({ text });
+      isAsking = await GroqApi.Isaskingaboutanswerasync(userMsg);
     } catch (e) {
       console.error('Isasking API failed', e);
     }
