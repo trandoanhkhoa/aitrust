@@ -119,7 +119,6 @@ export default function ChatboxLaptopUI() {
 
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
       if (isAsking) {
-        alert(IDquestioncurrent, response);
         //Lưu IDquestioncurrent và câu trả lời của AI vào localstorage
         saveAIResponse(IDquestioncurrent, response);
       }
