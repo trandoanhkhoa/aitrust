@@ -196,12 +196,11 @@ export default function ChatboxMobileUI() {
         isaskingaboutanswer: isAsking,
       });
 
-      const response =
-        res &&
-        res.choices &&
-        res.choices[0] &&
-        res.choices[0].message &&
-        res.choices[0].message.content;
+      const response = res.choices[0].message.content
+        .replace(/\r\n/g, '\n') // Windows -> Unix
+        .replace(/\r/g, '\n') // old Mac
+        .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
+        .trim();
 
       setMessages((prev) => [
         ...prev,

@@ -115,7 +115,11 @@ export default function ChatboxLaptopUI() {
         isaskingaboutanswer: isAsking,
       });
 
-      const response = res.choices[0].message.content;
+      const response = res.choices[0].message.content
+        .replace(/\r\n/g, '\n') // Windows -> Unix
+        .replace(/\r/g, '\n') // old Mac
+        .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
+        .trim();
 
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
       if (isAsking) {
