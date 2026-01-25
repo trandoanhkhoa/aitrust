@@ -55,7 +55,7 @@ export default function QuizSlide() {
     startTime();
   }, []);
   const handleAnswerChange = (questionID, selectedValue) => {
-    console.log('Selected answer:', selectedValue);
+    //console.log('Selected answer:', selectedValue);
     const storedItems = JSON.parse(localStorage.getItem('Itemquestion')) || [];
 
     const updatedItems = storedItems.map((item) =>
