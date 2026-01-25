@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import Question from '../../api/QuestionApi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import GroqApi from '../../api/GroqApi';
@@ -86,10 +87,10 @@ export default function ChatboxLaptopUI() {
       idquestioncurrent: IDquestioncurrent,
       questiontrytimes: questionTrytimes,
       isaskingaboutanswer: false,
-      messagehistories: getMessageHistoryByQuestion(IDquestioncurrent),
+      MessageHistories: getMessageHistoryByQuestion(IDquestioncurrent),
     };
-
     setMessages((prev) => [...prev, userMsg]);
+
     try {
       /* ========================
      4. CHECK asking TRƯỚC
@@ -110,17 +111,21 @@ export default function ChatboxLaptopUI() {
       /* ========================
         6. Gọi AI SAU CÙNG
       ========================= */
-      const res = await GroqApi.getResponse({
-        ...userMsg,
-        isaskingaboutanswer: isAsking,
-      });
-
-      const response = res.choices[0].message.content
-        .replace(/\r\n/g, '\n') // Windows -> Unix
-        .replace(/\r/g, '\n') // old Mac
-        .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
-        .trim();
-
+      let res = null;
+      if (questionTrytimes === 0) {
+        res = await Question.getquestionanswerbyid(IDquestioncurrent);
+      } else {
+        res = await GroqApi.getResponse({
+          ...userMsg,
+          isaskingaboutanswer: isAsking,
+        });
+      }
+      let response = '';
+      if (questionTrytimes === 0) {
+        response = res.hallucination;
+      } else {
+        response = res.choices[0].message.content;
+      }
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
       if (isAsking) {
         //Lưu IDquestioncurrent và câu trả lời của AI vào localstorage

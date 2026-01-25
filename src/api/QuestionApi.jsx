@@ -1,8 +1,10 @@
-import axios from './axiosClient'
+import axios from './axiosClient';
 
 const Question = {
-    getQuestions: () => 
-        axios.get("/question/getquestions")
-}
+  getQuestions: () => axios.get('/question/getquestions'),
+  getquestionanswerbyid: (idquestion) => {
+    return axios.get(`/question/getanswersbyid/${idquestion}`);
+  },
+};
 
-export default Question
+export default Question;
