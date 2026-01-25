@@ -124,7 +124,11 @@ export default function ChatboxLaptopUI() {
       if (questionTrytimes === 0) {
         response = res.hallucination;
       } else {
-        response = res.choices[0].message.content;
+        response = res.choices[0].message.content
+          .replace(/\r\n/g, '\n') // Windows -> Unix
+          .replace(/\r/g, '\n') // old Mac
+          .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
+          .trim();
       }
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
       if (isAsking) {
