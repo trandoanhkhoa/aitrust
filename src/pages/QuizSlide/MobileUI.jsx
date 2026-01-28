@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import Question from '../../api/QuestionApi';
-
+import useSubmitTest from '../../components/Hooks/useSubmitTest';
 export default function QuizSlide() {
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { handleSubmitTest, thongBao, clearThongBao } = useSubmitTest();
+
   const [itemQuestion, setItemQuestion] = useState(() => {
     const saved = localStorage.getItem('Itemquestion');
     return saved ? JSON.parse(saved) : [];
   });
+
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   useEffect(() => {
     const startTime = () => {
@@ -42,7 +45,15 @@ export default function QuizSlide() {
 
     fetchData();
   }, []);
+  useEffect(() => {
+    if (!thongBao) return;
 
+    const timer = setTimeout(() => {
+      clearThongBao();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [thongBao, clearThongBao]);
   const handleAnswerChange = (questionID, selectedValue) => {
     const storedItems = JSON.parse(localStorage.getItem('Itemquestion')) || [];
 
@@ -74,6 +85,23 @@ export default function QuizSlide() {
   const currentAnswer = itemQuestion.find((i) => i.idquestion === question.id)?.useranswer;
   return (
     <div className="w-full flex justify-center px-2 sm:px-4">
+      {thongBao && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+          <div
+            className="
+      min-w-[280px] max-w-[420px]
+      px-4 py-3 rounded-xl shadow-lg
+      border border-yellow-200
+      bg-yellow-50 text-yellow-900
+      flex items-center gap-2
+      animate-slideDown
+    "
+          >
+            <span className="text-lg">⚠️</span>
+            <p className="text-sm font-medium">{thongBao}</p>
+          </div>
+        </div>
+      )}
       <div className="w-full max-w-[850px]">
         {/* ================= NAVIGATION ================= */}
         <div className="mb-3 flex items-center justify-between gap-3">
@@ -91,13 +119,19 @@ export default function QuizSlide() {
           </div>
 
           {/* NEXT */}
-          <button
-            disabled={currentIndex === questions.length - 1}
-            onClick={next}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-40"
-          >
-            Next →
-          </button>
+
+          {currentIndex === questions.length - 1 ? (
+            <button
+              onClick={() => handleSubmitTest(false)}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold"
+            >
+              🚀 Nộp bài
+            </button>
+          ) : (
+            <button onClick={next} className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+              Next →
+            </button>
+          )}
         </div>
         {/* CARD */}
         <div

@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import GroqApi from '../../api/GroqApi';
+import Question from '../../api/QuestionApi';
 
 export default function ChatboxMobileUI() {
   const queryRef = useRef('');
@@ -191,16 +192,25 @@ export default function ChatboxMobileUI() {
 
     /* ===== API 2: GET RESPONSE ===== */
     try {
-      const res = await GroqApi.getResponse({
-        ...userMsg,
-        isaskingaboutanswer: isAsking,
-      });
-
-      const response = res.choices[0].message.content
-        .replace(/\r\n/g, '\n') // Windows -> Unix
-        .replace(/\r/g, '\n') // old Mac
-        .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
-        .trim();
+      let res = null;
+      if (questionTrytimes === 0) {
+        res = await Question.getquestionanswerbyid(IDquestioncurrent);
+      } else {
+        res = await GroqApi.getResponse({
+          ...userMsg,
+          isaskingaboutanswer: isAsking,
+        });
+      }
+      let response = '';
+      if (questionTrytimes === 0) {
+        response = res.hallucination;
+      } else {
+        response = res.choices[0].message.content
+          .replace(/\r\n/g, '\n') // Windows -> Unix
+          .replace(/\r/g, '\n') // old Mac
+          .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
+          .trim();
+      }
 
       setMessages((prev) => [
         ...prev,

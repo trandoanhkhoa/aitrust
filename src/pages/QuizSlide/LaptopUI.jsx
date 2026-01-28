@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import Question from '../../api/QuestionApi';
-
+import useSubmitTest from '../../components/Hooks/useSubmitTest';
 export default function QuizSlide() {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [questions, setquestions] = useState([]);
-
+  const { handleSubmitTest, thongBao, clearThongBao } = useSubmitTest();
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // Value của answer câu hỏi
   const itemQuestion = JSON.parse(localStorage.getItem('Itemquestion')) || [];
   const answeredMap = new Map(itemQuestion.map((i) => [i.idquestion, i.useranswer]));
@@ -54,6 +54,15 @@ export default function QuizSlide() {
 
     startTime();
   }, []);
+  useEffect(() => {
+    if (!thongBao) return;
+
+    const timer = setTimeout(() => {
+      clearThongBao();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [thongBao, clearThongBao]);
   const handleAnswerChange = (questionID, selectedValue) => {
     //console.log('Selected answer:', selectedValue);
     const storedItems = JSON.parse(localStorage.getItem('Itemquestion')) || [];
@@ -111,6 +120,23 @@ export default function QuizSlide() {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
         >
+          {thongBao && (
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+              <div
+                className="
+      min-w-[280px] max-w-[420px]
+      px-4 py-3 rounded-xl shadow-lg
+      border border-yellow-200
+      bg-yellow-50 text-yellow-900
+      flex items-center gap-2
+      animate-slideDown
+    "
+              >
+                <span className="text-lg">⚠️</span>
+                <p className="text-sm font-medium">{thongBao}</p>
+              </div>
+            </div>
+          )}
           <div
             className="flex transition-transform duration-300"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -200,13 +226,21 @@ export default function QuizSlide() {
         >
           ← Prev
         </button>
-        <button
-          onClick={next}
-          disabled={currentIndex === questions.length - 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-40"
-        >
-          Next →
-        </button>
+        {currentIndex === questions.length - 1 ? (
+          <button
+            onClick={() => handleSubmitTest(false)}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold"
+          >
+            🚀 Nộp bài
+          </button>
+        ) : (
+          <button
+            onClick={next}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-40"
+          >
+            Next →
+          </button>
+        )}
       </div>
     </div>
   );

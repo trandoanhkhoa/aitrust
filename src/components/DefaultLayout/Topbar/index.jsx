@@ -246,8 +246,8 @@ export default function Topbar() {
         </button>
       </div> */}
       <div
-        className="w-full h-16 bg-white border-b px-4 md:px-6
-                grid grid-cols-[auto_1fr_auto] items-center"
+        className="hidden md:grid w-full h-16 bg-white border-b px-4 md:px-6
+             grid-cols-[auto_1fr_auto] items-center"
       >
         {/* LEFT */}
         <div className="flex items-center gap-2">

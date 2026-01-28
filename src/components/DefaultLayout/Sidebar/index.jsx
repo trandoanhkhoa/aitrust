@@ -13,7 +13,7 @@ function Sidebar() {
       {/* ===== Nút mở menu (chỉ hiện trên mobile / tablet) ===== */}
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-slate-900 text-white p-2 rounded-lg shadow-lg"
+        className="md:hidden fixed top-[44%] left-[-12px] z-50 bg-slate-900 text-white p-2 rounded-lg shadow-lg"
       >
         ☰
       </button>
