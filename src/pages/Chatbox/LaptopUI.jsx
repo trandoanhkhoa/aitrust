@@ -111,25 +111,15 @@ export default function ChatboxLaptopUI() {
       /* ========================
         6. Gọi AI SAU CÙNG
       ========================= */
-      let res = null;
-      if (questionTrytimes === 0) {
-        res = await Question.getquestionanswerbyid(IDquestioncurrent);
-      } else {
-        res = await GroqApi.getResponse({
-          ...userMsg,
-          isaskingaboutanswer: isAsking,
-        });
-      }
-      let response = '';
-      if (questionTrytimes === 0) {
-        response = res.hallucination;
-      } else {
-        response = res.choices[0].message.content
-          .replace(/\r\n/g, '\n') // Windows -> Unix
-          .replace(/\r/g, '\n') // old Mac
-          .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
-          .trim();
-      }
+      const res = await GroqApi.getResponse({
+        ...userMsg,
+        isaskingaboutanswer: isAsking,
+      });
+      const response = res.choices[0].message.content
+        .replace(/\r\n/g, '\n') // Windows -> Unix
+        .replace(/\r/g, '\n') // old Mac
+        .replace(/\n+/g, '\n') // nhiều \n -> 1 \n
+        .trim();
       setMessages((prev) => [...prev, { role: 'ai', text: response }]);
       if (isAsking) {
         //Lưu IDquestioncurrent và câu trả lời của AI vào localstorage
